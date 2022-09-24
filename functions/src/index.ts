@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import axios from "axios";
+import {fetchDevices} from "./nature-api";
 
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
@@ -14,19 +14,12 @@ export const getDevices = functions
     .https
     .onRequest(async (request, response) => {
       try {
-        const res = await axios.get("https://api.nature.global/1/devices", {
-          method: "GET",
-          headers: {
-            "content-type": "application/json",
-            "authorization": `Bearer ${process.env.NATURE_API_ACCESS_TOKEN}`,
-          },
+        const devices = await fetchDevices({
+          accessToken: process.env.NATURE_API_ACCESS_TOKEN as string,
         });
-        response.status(200).json(res.data);
+        response.status(200).json(devices);
       } catch (error) {
-        functions.logger.info(
-            error,
-            {structuredData: true},
-        );
+        functions.logger.info(error, {structuredData: true});
         response.status(503).send("Error!");
       }
     });

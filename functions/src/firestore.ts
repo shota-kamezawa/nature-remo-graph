@@ -1,4 +1,4 @@
-import type {firestore} from "firebase-admin";
+import {firestore} from "firebase-admin";
 import type {Device, SensorKind, SensorValue} from "./nature-api";
 
 const CollectionEnum = {
@@ -13,9 +13,11 @@ export type DeviceDocument = {
   firmware_version: Device["firmware_version"];
 };
 
-export type SensorValueDocument = SensorValue & {
+export type SensorValueDocument = {
   device_id: Device["id"];
   kind: SensorKind;
+  val: SensorValue["val"];
+  created_at: firestore.Timestamp;
 };
 
 export type RegistrationOptions<T> = {
@@ -39,7 +41,8 @@ export const makeSensorValueDocument = (
       .map(([kind, value]) => ({
         device_id: device.id,
         kind: kind as SensorKind,
-        ...value,
+        val: value.val,
+        created_at: firestore.Timestamp.fromDate(new Date(value.created_at)),
       }))
 );
 
@@ -64,7 +67,7 @@ export const registerSensorValueDocuments = async (
   const batch = firestore.batch();
 
   documents.forEach((document) => {
-    const docRef = collectionRef.doc(document.created_at);
+    const docRef = collectionRef.doc(document.created_at.toDate().toJSON());
     batch.set(docRef, document, {merge: true});
   });
 

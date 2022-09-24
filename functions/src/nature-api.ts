@@ -5,6 +5,12 @@ export type SensorValue = {
   created_at: string;
 };
 
+export type SensorKind =
+  | "te"
+  | "hu"
+  | "il"
+  | "mo";
+
 export type Device = {
   id: string;
   name: string;
@@ -15,12 +21,7 @@ export type Device = {
   firmware_version: string;
   mac_address: string;
   serial_number: string;
-  newest_events: {
-    te: SensorValue;
-    hu: SensorValue;
-    il: SensorValue;
-    mo: SensorValue;
-  };
+  newest_events: Record<SensorKind, SensorValue>;
 };
 
 export type APIOptions = {

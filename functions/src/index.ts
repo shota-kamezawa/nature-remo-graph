@@ -1,13 +1,16 @@
+import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {fetchDevices} from "./nature-api";
+import {
+  makeDeviceDocument,
+  makeSensorValueDocument,
+  registerDeviceDocuments,
+  registerSensorValueDocuments,
+} from "./firestore";
 
-// Start writing Firebase Functions
-// https://firebase.google.com/docs/functions/typescript
+admin.initializeApp();
 
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+const firestore = admin.firestore();
 
 export const getDevices = functions
     .runWith({secrets: ["NATURE_API_ACCESS_TOKEN"]})
@@ -17,9 +20,31 @@ export const getDevices = functions
         const devices = await fetchDevices({
           accessToken: process.env.NATURE_API_ACCESS_TOKEN as string,
         });
+
+        const deviceDocuments = devices.map(makeDeviceDocument);
+        const sensorValueDocuments = devices
+            .map(makeSensorValueDocument)
+            .flat();
+
+        const [
+          deviceResults,
+          sensorValueResults,
+        ] = await Promise.allSettled([
+          registerDeviceDocuments({
+            firestore,
+            documents: deviceDocuments,
+          }),
+          registerSensorValueDocuments({
+            firestore,
+            documents: sensorValueDocuments,
+          }),
+        ]);
+
+        functions.logger.info(deviceResults, {structuredData: true});
+        functions.logger.info(sensorValueResults, {structuredData: true});
         response.status(200).json(devices);
       } catch (error) {
-        functions.logger.info(error, {structuredData: true});
+        functions.logger.error(error, {structuredData: true});
         response.status(503).send("Error!");
       }
     });

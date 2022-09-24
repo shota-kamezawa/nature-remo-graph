@@ -1,7 +1,7 @@
 import {firestore} from "firebase-admin";
 import type {Device, SensorKind, SensorValue} from "./nature-api";
 
-const CollectionEnum = {
+export const CollectionEnum = {
   device: "devices",
   sensorValue: "sensor_values",
 } as const;

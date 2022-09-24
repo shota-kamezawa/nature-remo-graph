@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {fetchDevices} from "./nature-api";
 import {
+  CollectionEnum,
   makeDeviceDocument,
   makeSensorValueDocument,
   registerDeviceDocuments,
@@ -11,6 +12,26 @@ import {
 admin.initializeApp();
 
 const firestore = admin.firestore();
+
+const logWriteResult = (options: {
+  settledResult: PromiseSettledResult<unknown[]>,
+  name: string,
+}): void => {
+  const {name, settledResult} = options;
+
+  if (settledResult.status === "fulfilled") {
+    functions.logger.info(
+        `${name}: ${settledResult.value.length}`,
+        {structuredData: true},
+    );
+  } else {
+    functions.logger.error(
+        `${name}:`,
+        settledResult.reason,
+        {structuredData: true},
+    );
+  }
+};
 
 export const getDevices = functions
     .runWith({secrets: ["NATURE_API_ACCESS_TOKEN"]})
@@ -28,8 +49,8 @@ export const getDevices = functions
             .flat();
 
         const [
-          deviceResults,
-          sensorValueResults,
+          deviceResult,
+          sensorValueResult,
         ] = await Promise.allSettled([
           registerDeviceDocuments({
             firestore,
@@ -41,8 +62,15 @@ export const getDevices = functions
           }),
         ]);
 
-        functions.logger.info(deviceResults, {structuredData: true});
-        functions.logger.info(sensorValueResults, {structuredData: true});
+        logWriteResult({
+          name: CollectionEnum.device,
+          settledResult: deviceResult,
+        });
+
+        logWriteResult({
+          name: CollectionEnum.sensorValue,
+          settledResult: sensorValueResult,
+        });
       } catch (error) {
         functions.logger.error(error, {structuredData: true});
       }

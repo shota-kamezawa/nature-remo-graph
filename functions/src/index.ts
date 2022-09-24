@@ -36,7 +36,7 @@ const logWriteResult = (options: {
 export const getDevices = functions
     .runWith({secrets: ["NATURE_API_ACCESS_TOKEN"]})
     .pubsub
-    .schedule("every 10 minutes")
+    .schedule("every 5 minutes")
     .onRun(async () => {
       try {
         const devices = await fetchDevices({

@@ -14,8 +14,9 @@ const firestore = admin.firestore();
 
 export const getDevices = functions
     .runWith({secrets: ["NATURE_API_ACCESS_TOKEN"]})
-    .https
-    .onRequest(async (request, response) => {
+    .pubsub
+    .schedule("every 10 minutes")
+    .onRun(async () => {
       try {
         const devices = await fetchDevices({
           accessToken: process.env.NATURE_API_ACCESS_TOKEN as string,
@@ -42,9 +43,7 @@ export const getDevices = functions
 
         functions.logger.info(deviceResults, {structuredData: true});
         functions.logger.info(sensorValueResults, {structuredData: true});
-        response.status(200).json(devices);
       } catch (error) {
         functions.logger.error(error, {structuredData: true});
-        response.status(503).send("Error!");
       }
     });

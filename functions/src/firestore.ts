@@ -6,26 +6,20 @@ export const CollectionEnum = {
   sensorValue: "sensor_values",
 } as const;
 
-export type DeviceDocument = {
+type DeviceDocument = {
   id: Device["id"];
   name: Device["name"];
   serial_number: Device["serial_number"];
   firmware_version: Device["firmware_version"];
 };
 
-export type SensorValueDocument = {
-  device_id: Device["id"];
+type SensorValueDocument = {
   kind: SensorKind;
   val: SensorValue["val"];
   created_at: firestore.Timestamp;
 };
 
-export type RegistrationOptions<T> = {
-  firestore: firestore.Firestore;
-  documents: T[];
-};
-
-export const makeDeviceDocument = (
+const makeDeviceDocument = (
     device: Device,
 ): DeviceDocument => ({
   id: device.id,
@@ -34,41 +28,45 @@ export const makeDeviceDocument = (
   firmware_version: device.firmware_version,
 });
 
-export const makeSensorValueDocument = (
+const makeSensorValueDocuments = (
     device: Device,
 ): SensorValueDocument[] => (
   Object.entries(device.newest_events)
       .map(([kind, value]) => ({
-        device_id: device.id,
         kind: kind as SensorKind,
         val: value.val,
         created_at: firestore.Timestamp.fromDate(new Date(value.created_at)),
       }))
 );
 
-export const registerDeviceDocuments = async (
-    {firestore, documents}: RegistrationOptions<DeviceDocument>,
-): Promise<firestore.WriteResult[]> => {
-  const collectionRef = firestore.collection(CollectionEnum.device);
+const makeSensorValueDocumentPath = (
+    document: SensorValueDocument,
+): string => (
+  `${document.created_at.toDate().toJSON()}__${document.kind}`
+);
+
+export const registerDevices = async ({
+  firestore,
+  devices,
+}: {
+  firestore: firestore.Firestore;
+  devices: readonly Device[];
+}): Promise<firestore.WriteResult[]> => {
   const batch = firestore.batch();
+  const deviceCollectionRef = firestore.collection(CollectionEnum.device);
 
-  documents.forEach((document) => {
-    const docRef = collectionRef.doc(document.id);
-    batch.set(docRef, document, {merge: true});
-  });
+  devices.forEach((device) => {
+    const deviceRef = deviceCollectionRef.doc(device.id);
+    const deviceDocument = makeDeviceDocument(device);
+    batch.set(deviceRef, deviceDocument, {merge: true});
 
-  return batch.commit();
-};
-
-export const registerSensorValueDocuments = async (
-    {firestore, documents}: RegistrationOptions<SensorValueDocument>,
-): Promise<firestore.WriteResult[]> => {
-  const collectionRef = firestore.collection(CollectionEnum.sensorValue);
-  const batch = firestore.batch();
-
-  documents.forEach((document) => {
-    const docRef = collectionRef.doc(document.created_at.toDate().toJSON());
-    batch.set(docRef, document, {merge: true});
+    const svCollectionRef = deviceRef.collection(CollectionEnum.sensorValue);
+    const svDocuments = makeSensorValueDocuments(device);
+    svDocuments.forEach((svDocument) => {
+      const svDocumentPath = makeSensorValueDocumentPath(svDocument);
+      const svDocumentRef = svCollectionRef.doc(svDocumentPath);
+      batch.set(svDocumentRef, svDocument, {merge: true});
+    });
   });
 
   return batch.commit();

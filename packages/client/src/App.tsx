@@ -6,6 +6,7 @@ import { RouteUserOnly } from './components/RouteUserOnly'
 
 const Home = lazy(() => import('./routes/Home'))
 const SignIn = lazy(() => import('./routes/SignIn'))
+const SignOut = lazy(() => import('./routes/SignOut'))
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<RouteUserOnly element={<Home />} />} />
             <Route path="/signIn" element={<SignIn />} />
+            <Route path="/signOut" element={<SignOut />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

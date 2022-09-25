@@ -7,8 +7,8 @@
       "firebase-debug.*.log"
     ],
     "predeploy": [
-      "yarn --prefix \"$RESOURCE_DIR\" run lint",
-      "yarn --prefix \"$RESOURCE_DIR\" run build"
+      "yarn workspace functions run lint",
+      "yarn workspace functions run build"
     ],
     "source": "packages/functions"
   },

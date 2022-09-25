@@ -1,0 +1,14 @@
+{
+  "name": "nature-remo-graph",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "shota-kamezawa <75684759+shota-kamezawa@users.noreply.github.com>",
+  "license": "Apache-2.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "typescript": "^4.8.3"
+  }
+}

@@ -2,7 +2,7 @@ import { getAuth } from 'firebase/auth'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export default () => {
+const SignOut = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -15,3 +15,5 @@ export default () => {
 
   return <></>
 }
+
+export default SignOut

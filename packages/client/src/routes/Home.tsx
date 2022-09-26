@@ -1,15 +1,15 @@
 import {
-  getFirestore,
-  query,
   collection,
   getDocs,
-  orderBy,
+  getFirestore,
   limit,
+  orderBy,
+  query,
   where,
 } from 'firebase/firestore'
 import { useState } from 'react'
 
-export default () => {
+const Home = () => {
   const db = getFirestore()
 
   const [loading, setLoading] = useState(false)
@@ -70,3 +70,5 @@ export default () => {
     </>
   )
 }
+
+export default Home

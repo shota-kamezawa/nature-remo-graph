@@ -1,8 +1,8 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
-import { AuthProvider } from './providers/Auth'
 import { RouteUserOnly } from './components/RouteUserOnly'
+import { AuthProvider } from './providers/Auth'
 
 const Home = lazy(() => import('./routes/Home'))
 const SignIn = lazy(() => import('./routes/SignIn'))
@@ -14,9 +14,10 @@ const App = () => {
       <BrowserRouter>
         <Suspense fallback={<div>Loading...</div>}>
           <Routes>
-            <Route path="/" element={<RouteUserOnly element={<Home />} />} />
-            <Route path="/signIn" element={<SignIn />} />
-            <Route path="/signOut" element={<SignOut />} />
+            <Route element={<RouteUserOnly element={<Home />} />} path="/" />
+            <Route element={<SignIn />} path="/signIn" />
+            <Route element={<SignOut />} path="/signOut" />
+            <Route element={<SignOut />} path="/mock" />
           </Routes>
         </Suspense>
       </BrowserRouter>

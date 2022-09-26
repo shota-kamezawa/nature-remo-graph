@@ -7,7 +7,7 @@ export const RouteUserOnly = (props: { element: JSX.Element }) => {
 
   if (!user) {
     return (
-      <Navigate to="/signIn" state={{ from: useLocation() }} replace={false} />
+      <Navigate replace={false} state={{ from: useLocation() }} to="/signIn" />
     )
   }
 

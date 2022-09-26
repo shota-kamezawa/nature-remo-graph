@@ -1,7 +1,7 @@
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 
-export default () => {
+const SignIn = () => {
   const navigate = useNavigate()
 
   const onClick = async () => {
@@ -22,3 +22,5 @@ export default () => {
     </>
   )
 }
+
+export default SignIn

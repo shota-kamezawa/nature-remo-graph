@@ -1,0 +1,64 @@
+name: Deploy client
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "packages/client/**"
+      - ".node-version"
+      - "firebase.json"
+      - "package.json"
+      - "yarn.lock"
+
+env:
+  NODE_ENV: production
+  GOOGLE_APPLICATION_CREDENTIALS: /tmp/credentials.json
+
+jobs:
+  deploy_live_website:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: ".node-version"
+          cache: yarn
+
+      - name: Install Firebase CLI
+        run: yarn global add firebase-tools
+
+      - name: Make credentials file
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: echo "$FIREBASE_SERVICE_ACCOUNT" > "${{ env.GOOGLE_APPLICATION_CREDENTIALS }}"
+
+      - name: Set Firebase project
+        run: GOOGLE_APPLICATION_CREDENTIALS="${{ env.GOOGLE_APPLICATION_CREDENTIALS }}" firebase use "${{ secrets.FIREBASE_PROJECT_ID }}"
+
+      - name: Generate Firebase SDK config
+        run: GOOGLE_APPLICATION_CREDENTIALS="${{ env.GOOGLE_APPLICATION_CREDENTIALS }}" yarn workspace client run generate:firebase-config
+
+      - name: Restore node_modules
+        uses: actions/cache@v3
+        with:
+          path: "node_modules"
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-node-modules-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --production
+
+      - name: Build
+        run: yarn workspace client run build
+
+      - name: Deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+          channelId: live

@@ -1,4 +1,8 @@
 {
+  "firestore": {
+    "indexes": "firestore.indexes.json",
+    "rules": "firestore.rules"
+  },
   "functions": {
     "ignore": [
       "node_modules",
@@ -12,8 +16,14 @@
     ],
     "source": "packages/functions"
   },
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
+  "hosting": {
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "public": "packages/client/dist",
+    "rewrites": [
+      {
+        "destination": "/index.html",
+        "source": "**"
+      }
+    ]
   }
 }

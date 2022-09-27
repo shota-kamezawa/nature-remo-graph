@@ -1,9 +1,9 @@
 import type { ScatterDataPoint } from 'chart.js'
 
-import type { SensorItem } from './types'
+import type { SensorValueItem } from './types'
 
-export const convertSensorItemToChartData = (
-  item: SensorItem,
+export const convertSensorValueItemToChartDataItem = (
+  item: SensorValueItem,
 ): ScatterDataPoint => ({
   x: item.timestamp,
   y: item.value,

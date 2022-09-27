@@ -7,6 +7,7 @@ import { AuthProvider } from './providers/Auth'
 const Home = lazy(() => import('./routes/Home'))
 const SignIn = lazy(() => import('./routes/SignIn'))
 const SignOut = lazy(() => import('./routes/SignOut'))
+const Mock = lazy(() => import('./routes/Mock'))
 
 const App = () => {
   return (
@@ -17,7 +18,7 @@ const App = () => {
             <Route element={<RouteUserOnly element={<Home />} />} path="/" />
             <Route element={<SignIn />} path="/signIn" />
             <Route element={<SignOut />} path="/signOut" />
-            <Route element={<SignOut />} path="/mock" />
+            <Route element={<Mock />} path="/mock" />
           </Routes>
         </Suspense>
       </BrowserRouter>

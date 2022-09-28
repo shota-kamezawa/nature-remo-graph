@@ -1,3 +1,4 @@
+import { Button } from '@mui/material'
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 
@@ -18,7 +19,9 @@ const SignIn = () => {
 
   return (
     <>
-      <button onClick={onClick}>サインイン</button>
+      <Button onClick={onClick} variant="contained">
+        サインイン
+      </Button>
     </>
   )
 }

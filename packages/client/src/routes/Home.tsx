@@ -1,3 +1,4 @@
+import { Button } from '@mui/material'
 import {
   CollectionEnum,
   DeviceDocument,
@@ -146,13 +147,21 @@ const Home = () => {
   return (
     <>
       {!devices.length ? (
-        <button disabled={loading} onClick={onClickGetDevices}>
+        <Button
+          disabled={loading}
+          onClick={onClickGetDevices}
+          variant="contained"
+        >
           get devices
-        </button>
+        </Button>
       ) : !sensorValues.length ? (
-        <button disabled={loading} onClick={onClickGetSensorValues}>
+        <Button
+          disabled={loading}
+          onClick={onClickGetSensorValues}
+          variant="contained"
+        >
           get sensor_values
-        </button>
+        </Button>
       ) : (
         <NatureRemoGraph
           {...{

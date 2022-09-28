@@ -1,11 +1,8 @@
+import type { SensorKind } from '../nature-api'
+
 import type { Timestamp } from 'firebase/firestore'
 
-export type SensorKind = 'te' | 'hu' | 'il' | 'mo'
-
-export const CollectionEnum = {
-  device: 'devices',
-  sensorValue: 'sensor_values',
-} as const
+export type { SensorKind }
 
 export type DeviceDocument = {
   id: string

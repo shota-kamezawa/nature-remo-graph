@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin'
 import * as functions from 'firebase-functions'
 
-import { CollectionEnum, registerDevices } from './firestore'
+import { registerDevices } from './firestore'
 import { fetchDevices } from './nature-api'
 
 admin.initializeApp()
@@ -22,7 +22,7 @@ export const getDevices = functions
         firestore,
       })
 
-      functions.logger.info(`${CollectionEnum.device}: ${results.length}`, {
+      functions.logger.info(`getDevices: registered ${results.length} items`, {
         structuredData: true,
       })
     } catch (error) {

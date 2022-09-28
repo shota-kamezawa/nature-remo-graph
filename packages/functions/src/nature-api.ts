@@ -1,11 +1,12 @@
+import type { SensorKind } from '@nature-remo-graph/shared/nature-api'
 import axios from 'axios'
+
+export type { SensorKind }
 
 export type SensorValue = {
   val: number
   created_at: string
 }
-
-export type SensorKind = 'te' | 'hu' | 'il' | 'mo'
 
 export type Device = {
   id: string

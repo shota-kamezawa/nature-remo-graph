@@ -1,3 +1,9 @@
+import {
+  CollectionEnum,
+  DeviceDocument,
+  SensorKindEnum,
+  SensorValueDocument,
+} from '@nature-remo-graph/shared/firestore'
 import type { ChartData, ChartOptions } from 'chart.js'
 import * as dateFns from 'date-fns'
 import {
@@ -21,12 +27,6 @@ import {
   makeTemperatureScaleOptions,
   makeTooltipLabelFormatter,
 } from '../utils/charts'
-import {
-  CollectionEnum,
-  DeviceDocument,
-  SensorValueDocument,
-  SensorValueKindEnum,
-} from '../utils/firestore'
 
 const Home = () => {
   const db = getFirestore()
@@ -43,9 +43,9 @@ const Home = () => {
     setLoading(true)
 
     try {
-      const q = query(collection(db, CollectionEnum.device))
+      const q = query(collection(db, CollectionEnum.devices))
       const querySnapshot = await getDocs(q)
-      console.log(CollectionEnum.device, querySnapshot.size)
+      console.log(CollectionEnum.devices, querySnapshot.size)
       setDevices(querySnapshot.docs.map((doc) => doc.data()) as never)
     } catch (error) {
       console.error(error)
@@ -67,16 +67,16 @@ const Home = () => {
       const q = query(
         collection(
           db,
-          CollectionEnum.device,
+          CollectionEnum.devices,
           devices[0].id,
-          CollectionEnum.sensorValue,
+          CollectionEnum.sensorValues,
         ),
         where('created_at', '>=', startDate),
         where('created_at', '<=', endDate),
         orderBy('created_at', 'desc'),
       )
       const querySnapshot = await getDocs(q)
-      console.log(CollectionEnum.sensorValue, querySnapshot.size)
+      console.log(CollectionEnum.sensorValues, querySnapshot.size)
       setSensorValues(querySnapshot.docs.map((doc) => doc.data()) as never)
     } catch (error) {
       console.error(error)
@@ -113,13 +113,13 @@ const Home = () => {
     })
 
   const humidities = sensorValues
-    .filter((doc) => doc.kind === SensorValueKindEnum.humidity)
+    .filter((doc) => doc.kind === SensorKindEnum.humidity)
     .map(convertDocumentToItem)
   const illuminations = sensorValues
-    .filter((doc) => doc.kind === SensorValueKindEnum.illumination)
+    .filter((doc) => doc.kind === SensorKindEnum.illumination)
     .map(convertDocumentToItem)
   const temperatures = sensorValues
-    .filter((doc) => doc.kind === SensorValueKindEnum.temperature)
+    .filter((doc) => doc.kind === SensorKindEnum.temperature)
     .map(convertDocumentToItem)
 
   const datasets: ChartData['datasets'] = [

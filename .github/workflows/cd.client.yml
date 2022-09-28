@@ -40,7 +40,7 @@ jobs:
         run: GOOGLE_APPLICATION_CREDENTIALS="${{ env.GOOGLE_APPLICATION_CREDENTIALS }}" firebase use "${{ secrets.FIREBASE_PROJECT_ID }}"
 
       - name: Generate Firebase SDK config
-        run: GOOGLE_APPLICATION_CREDENTIALS="${{ env.GOOGLE_APPLICATION_CREDENTIALS }}" yarn workspace client run generate:firebase-config
+        run: GOOGLE_APPLICATION_CREDENTIALS="${{ env.GOOGLE_APPLICATION_CREDENTIALS }}" yarn workspace @nature-remo-graph/client run generate:firebase-config
 
       - name: Restore node_modules
         uses: actions/cache@v3
@@ -53,7 +53,7 @@ jobs:
         run: yarn install --frozen-lockfile --production
 
       - name: Build
-        run: yarn workspace client run build
+        run: yarn workspace @nature-remo-graph/client run build
 
       - name: Deploy
         uses: FirebaseExtended/action-hosting-deploy@v0

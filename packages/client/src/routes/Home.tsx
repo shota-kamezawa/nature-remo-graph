@@ -17,7 +17,7 @@ import {
   query,
   where,
 } from 'firebase/firestore'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { NatureRemoGraph } from '../components/NatureRemoGraph'
 import {
@@ -87,13 +87,21 @@ const Home = () => {
     setLoading(false)
   }
 
-  if (!loading) {
-    if (!devices.length) {
+  const devicesFirstLoading = useRef(false)
+  useEffect(() => {
+    if (!devicesFirstLoading.current) {
+      devicesFirstLoading.current = true
       getDevices()
-    } else if (!sensorValues.length) {
+    }
+  }, [])
+
+  const sensorValuesFirstLoading = useRef(false)
+  useEffect(() => {
+    if (devices.length && !sensorValuesFirstLoading.current) {
+      sensorValuesFirstLoading.current = true
       updateGraph()
     }
-  }
+  }, [devices])
 
   const timeline = {
     max: endDate.toJSON(),

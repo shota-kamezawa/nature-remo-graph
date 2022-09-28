@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "packages/client/**"
+      - "packages/shared/**"
       - ".node-version"
       - "firebase.json"
       - "package.json"
@@ -28,20 +29,6 @@ jobs:
           node-version-file: "package.json"
           cache: yarn
 
-      - name: Install Firebase CLI
-        run: yarn global add firebase-tools
-
-      - name: Make credentials file
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: echo "$FIREBASE_SERVICE_ACCOUNT" > "${{ env.GOOGLE_APPLICATION_CREDENTIALS }}"
-
-      - name: Set Firebase project
-        run: GOOGLE_APPLICATION_CREDENTIALS="${{ env.GOOGLE_APPLICATION_CREDENTIALS }}" firebase use "${{ secrets.FIREBASE_PROJECT_ID }}"
-
-      - name: Generate Firebase SDK config
-        run: GOOGLE_APPLICATION_CREDENTIALS="${{ env.GOOGLE_APPLICATION_CREDENTIALS }}" yarn workspace @nature-remo-graph/client run generate:firebase-config
-
       - name: Restore node_modules
         uses: actions/cache@v3
         with:
@@ -51,6 +38,17 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile --production
+
+      - name: Make credentials file
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: echo "$FIREBASE_SERVICE_ACCOUNT" > "${{ env.GOOGLE_APPLICATION_CREDENTIALS }}"
+
+      - name: Set Firebase project
+        run: yarn workspace @nature-remo-graph/client run firebase use "${{ secrets.FIREBASE_PROJECT_ID }}"
+
+      - name: Generate Firebase SDK config
+        run: yarn workspace @nature-remo-graph/client run generate:firebase-config
 
       - name: Build
         run: yarn workspace @nature-remo-graph/client run build

@@ -47,7 +47,7 @@ export const registerDevices = async ({
     svDocuments.forEach((svDocument) => {
       const svDocumentPath = makeSensorValueDocumentPath(svDocument)
       const svDocumentRef = svCollectionRef.doc(svDocumentPath)
-      batch.set(svDocumentRef, svDocument, { merge: true })
+      batch.set(svDocumentRef, svDocument)
     })
   })
 

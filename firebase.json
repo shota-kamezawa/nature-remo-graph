@@ -11,8 +11,8 @@
       "firebase-debug.*.log"
     ],
     "predeploy": [
-      "yarn workspace functions run lint",
-      "yarn workspace functions run build"
+      "yarn workspace @nature-remo-graph/functions run lint",
+      "yarn workspace @nature-remo-graph/functions run build"
     ],
     "source": "packages/functions"
   },

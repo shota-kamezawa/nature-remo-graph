@@ -1,5 +1,5 @@
-import {
-  CollectionEnum,
+import type {
+  CollectionEnum as _CollectionEnum,
   DeviceDocument,
   SensorValueDocument,
 } from '@nature-remo-graph/shared/firestore'
@@ -7,6 +7,12 @@ import { firestore } from 'firebase-admin'
 import type { Timestamp } from 'firebase/firestore'
 
 import type { Device, SensorKind } from './nature-api'
+
+// HACK
+const CollectionEnum: typeof _CollectionEnum = {
+  devices: 'devices',
+  sensorValues: 'sensor_values',
+} as const
 
 const makeDeviceDocument = (device: Device): DeviceDocument => ({
   firmware_version: device.firmware_version,

@@ -167,13 +167,15 @@ const Home = () => {
         <CircularProgress />
       ) : (
         <>
-          <div>
+          <div style={{ alignItems: 'center', display: 'flex' }}>
             <DateTimePicker
               ampm={false}
               label="start"
               minutesStep={30}
               onChange={setStartDate as never}
-              renderInput={(params) => <TextField {...params} disabled />}
+              renderInput={(params) => (
+                <TextField {...params} onKeyDown={(e) => e.preventDefault()} />
+              )}
               value={startDate}
             />
             <DateTimePicker
@@ -181,10 +183,16 @@ const Home = () => {
               label="end"
               minutesStep={30}
               onChange={setEndDate as never}
-              renderInput={(params) => <TextField {...params} disabled />}
+              renderInput={(params) => (
+                <TextField {...params} onKeyDown={(e) => e.preventDefault()} />
+              )}
               value={endDate}
             />
-            <Button disabled={loading} onClick={updateGraph}>
+            <Button
+              disabled={loading}
+              onClick={updateGraph}
+              variant="contained"
+            >
               update
             </Button>
           </div>

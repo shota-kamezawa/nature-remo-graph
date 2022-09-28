@@ -1,4 +1,6 @@
-import { Button } from '@mui/material'
+import { Button, CircularProgress, TextField } from '@mui/material'
+import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import {
   CollectionEnum,
   DeviceDocument,
@@ -34,20 +36,25 @@ const Home = () => {
 
   const [loading, setLoading] = useState(false)
   const [devices, setDevices] = useState<DeviceDocument[]>([])
+  const [activeDeviceId, setActiveDeviceId] = useState<string>('')
   const [sensorValues, setSensorValues] = useState<SensorValueDocument[]>([])
-  const [dateRange, setDateRange] = useState<[Date, Date]>([
-    new Date(),
-    new Date(),
-  ])
+  const [endDate, setEndDate] = useState(
+    dateFns.add(dateFns.startOfHour(new Date()), { minutes: 30 }),
+  )
+  const [startDate, setStartDate] = useState(dateFns.sub(endDate, { hours: 6 }))
 
-  const onClickGetDevices = async () => {
+  const getDevices = async () => {
     setLoading(true)
 
     try {
       const q = query(collection(db, CollectionEnum.devices))
       const querySnapshot = await getDocs(q)
       console.log(CollectionEnum.devices, querySnapshot.size)
-      setDevices(querySnapshot.docs.map((doc) => doc.data()) as never)
+      const deviceDocs = querySnapshot.docs.map((doc) =>
+        doc.data(),
+      ) as DeviceDocument[]
+      setDevices(deviceDocs)
+      setActiveDeviceId(deviceDocs[0]?.id || '')
     } catch (error) {
       console.error(error)
     }
@@ -55,21 +62,15 @@ const Home = () => {
     setLoading(false)
   }
 
-  const onClickGetSensorValues = async () => {
+  const updateGraph = async () => {
     setLoading(true)
-
-    const now = new Date()
-    const startOfHour = dateFns.startOfHour(now)
-    const endDate = dateFns.add(startOfHour, { minutes: 30 })
-    const startDate = dateFns.sub(endDate, { hours: 6 })
-    setDateRange([startDate, endDate])
 
     try {
       const q = query(
         collection(
           db,
           CollectionEnum.devices,
-          devices[0].id,
+          activeDeviceId,
           CollectionEnum.sensorValues,
         ),
         where('created_at', '>=', startDate),
@@ -86,9 +87,17 @@ const Home = () => {
     setLoading(false)
   }
 
+  if (!loading) {
+    if (!devices.length) {
+      getDevices()
+    } else if (!sensorValues.length) {
+      updateGraph()
+    }
+  }
+
   const timeline = {
-    max: dateRange[1].toJSON(),
-    min: dateRange[0].toJSON(),
+    max: endDate.toJSON(),
+    min: startDate.toJSON(),
   }
 
   const scales: ChartOptions['scales'] = {
@@ -145,35 +154,46 @@ const Home = () => {
   ]
 
   return (
-    <>
-      {!devices.length ? (
-        <Button
-          disabled={loading}
-          onClick={onClickGetDevices}
-          variant="contained"
-        >
-          get devices
-        </Button>
-      ) : !sensorValues.length ? (
-        <Button
-          disabled={loading}
-          onClick={onClickGetSensorValues}
-          variant="contained"
-        >
-          get sensor_values
-        </Button>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      {!sensorValues.length ? (
+        <CircularProgress />
       ) : (
-        <NatureRemoGraph
-          {...{
-            datasets,
-            scales,
-            timeline,
-            tooltipLabelFormatter,
-          }}
-          height={500}
-        />
+        <>
+          <div>
+            <DateTimePicker
+              ampm={false}
+              label="start"
+              minutesStep={30}
+              onChange={setStartDate as never}
+              renderInput={(params) => <TextField {...params} disabled />}
+              value={startDate}
+            />
+            <DateTimePicker
+              ampm={false}
+              label="end"
+              minutesStep={30}
+              onChange={setEndDate as never}
+              renderInput={(params) => <TextField {...params} disabled />}
+              value={endDate}
+            />
+            <Button disabled={loading} onClick={updateGraph}>
+              update
+            </Button>
+          </div>
+          <div>
+            <NatureRemoGraph
+              {...{
+                datasets,
+                scales,
+                timeline,
+                tooltipLabelFormatter,
+              }}
+              height={500}
+            />
+          </div>
+        </>
       )}
-    </>
+    </LocalizationProvider>
   )
 }
 
